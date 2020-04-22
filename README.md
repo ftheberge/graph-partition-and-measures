@@ -1,5 +1,5 @@
 # Graph_Aware_Measures
-Python code implementing 11 graph-aware measures for comparing graph partitions.
+Python3 code implementing 11 graph-aware measures for comparing graph partitions.
 
 The measures are respectively:
 * 'rand': the RAND index
@@ -44,7 +44,7 @@ p_out = 0.025
 P = np.full((n_comm,n_comm),p_out)
 np.fill_diagonal(P,p_in)
 ## ground truth communities is stored in 'class' attribute
-g = ig.Graph.Preference(n=1000, type_dist=[1/n_comm]*n_comm, pref_matrix=P.tolist(), attribute='class')
+g = ig.Graph.Preference(n=1000, type_dist=[1.0/n_comm]*n_comm, pref_matrix=P.tolist(), attribute='class')
 gt = ig.clustering.VertexClustering.FromAttribute(g,'class')
 ```
 
