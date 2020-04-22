@@ -1,7 +1,6 @@
 # Graph_Aware_Measures
 Python code implementing 11 graph-aware measures for comparing graph partitions.
 
-Compute one of 11 graph-aware similarity measures to compare graph partitions.
 The measures are respectively:
 * 'rand': the RAND index
 * 'jaccard': the Jaccard index
