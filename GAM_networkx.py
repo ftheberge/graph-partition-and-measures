@@ -1,3 +1,4 @@
+# coding=utf-8
 import numpy as np
 import networkx
 
@@ -23,7 +24,7 @@ def GAM(self, u, v, method="rand", adjusted=True):
 
     Returns
     -------
-    A graph-aware similarity measure between partitions u and v.
+    A graph-aware similarity measure between vertex partitions u and v.
     
     Examples
     --------

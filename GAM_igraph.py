@@ -1,3 +1,4 @@
+# coding=utf-8
 import numpy as np
 import igraph
 
@@ -10,9 +11,9 @@ def GAM(self, u, v, method="rand", adjusted=True):
     ----------
     self: Graph of type 'igraph.Graph' on which the partitions are defined.
 
-    u: Partition of type 'igraph.clustering.VertexClustering' on 'self'.
+    u: Partition of type 'igraph.clustering.VertexClustering' on 'self', or a dictionary of node:community.
 
-    v: Partition of type 'igraph.clustering.VertexClustering' on 'self'.
+    v: Partition of type 'igraph.clustering.VertexClustering' on 'self', or a dictionary of node:community.
 
     method: 'str'
       one of 'rand', 'jaccard', 'mn', 'gmn', 'min' or 'max'
@@ -22,7 +23,7 @@ def GAM(self, u, v, method="rand", adjusted=True):
       
     Returns
     -------
-    A graph-aware similarity measure between partitions u and v.
+    A graph-aware similarity measure between vertex partitions u and v.
     
     Examples
     --------
