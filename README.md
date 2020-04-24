@@ -70,7 +70,7 @@ ml = community.best_partition(G)
 ec = community.ecg(G, ens_size=32)
 ```
 
-We show a few examples of measures we can compute with GAM:
+We show a few examples of measures we can compute with gam:
 
 ```python
 # for 'gam' partition are either iterables of sets of vertices or 'dict'
