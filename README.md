@@ -30,7 +30,7 @@ pip install python-louvain
 
 will install the 'community' library.
 
-Details foe ecg can be found in: 
+Details for ecg can be found in: 
 
 Valérie Poulin and François Théberge, "Ensemble clustering for graphs: comparisons and applications", Appl Netw Sci 4, 51 (2019). 
     https://doi.org/10.1007/s41109-019-0162-z
