@@ -91,7 +91,7 @@ igraph.Graph.gam = gam
 import igraph
 import numpy as np
 
-def community_ecg(self, weights=None, ens_size = 16, min_weight = 0.05):
+def community_ecg(self, weights=None, ens_size = 16, min_weight = 0.05, final='louvain'):
     """
     Stable ensemble-based graph clustering;
     the ensemble consists of single-level randomized Louvain; 
@@ -110,7 +110,9 @@ def community_ecg(self, weights=None, ens_size = 16, min_weight = 0.05):
       the size of the ensemble of single-level Louvain
     min_weight: double in range [0,1] 
       the ECG edge weight for edges with zero votes from the ensemble
-
+    final: 'louvain' or 'leiden'
+      the algorithm to run on the final re-weighted graph
+      
     Returns
     -------
     partition
@@ -119,6 +121,8 @@ def community_ecg(self, weights=None, ens_size = 16, min_weight = 0.05):
       The ECG edge weights
     partition.CSI
       The community strength index
+    partition.original_modularity
+      The modularity with respect to the original edge weights
 
     Notes
     -----
@@ -152,9 +156,13 @@ def community_ecg(self, weights=None, ens_size = 16, min_weight = 0.05):
     core = self.shell_index()
     ecore = [min(core[x.tuple[0]],core[x.tuple[1]]) for x in self.es]
     w = [W[i] if ecore[i]>1 else min_weight for i in range(len(ecore))]
-    part = self.community_multilevel(weights=w)
+    if final=='leiden':
+        part = self.community_leiden(weights=w, objective_function='modularity')
+    else:
+        part = self.community_multilevel(weights=w)
     part.W = w
     part.CSI = 1-2*np.sum([min(1-i,i) for i in w])/len(w)
+    part.original_modularity = self.modularity(part.membership, weights=weights)
     return part
 
 igraph.Graph.community_ecg = community_ecg
