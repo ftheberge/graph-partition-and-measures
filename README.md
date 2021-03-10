@@ -1,6 +1,10 @@
 # Graph Partition and Measures
 
 Python3 code implementing 11 graph-aware measures (gam) for comparing graph partitions as well as a stable ensemble-based graph partition algorithm (ecg).
+This code is pip installable for both igraph and networkx:
+
+* PyPI (igraph): https://pypi.org/project/partition-igraph/
+* PyPI (networkx): https://pypi.org/project/partition-networkx/
 
 ## Graph aware measures (gam)
 
@@ -15,7 +19,9 @@ The measures are respectively:
 Each measure can be adjusted (recommended) or not, except for 'jaccard'.
 Details can be found in: 
 
-Valérie Poulin and François Théberge, "Comparing Graph Clusterings: Set partition measures vs. Graph-aware measures", https://arxiv.org/abs/1806.11494.
+* V. Poulin and F. Theberge, "Comparing Graph Clusterings: Set partition measures vs. Graph-aware measures," in IEEE Transactions on Pattern Analysis and Machine Intelligence, https://doi.org/10.1109/TPAMI.2020.3009862 and https://ieeexplore.ieee.org/document/9142444
+
+* Pre-print: https://arxiv.org/abs/1806.11494
 
 ## Ensemble clustering for graphs (ecg)
 
@@ -32,8 +38,13 @@ will install the 'community' library.
 
 Details for ecg can be found in: 
 
-Valérie Poulin and François Théberge, "Ensemble clustering for graphs: comparisons and applications", Appl Netw Sci 4, 51 (2019). 
-    https://doi.org/10.1007/s41109-019-0162-z
+* Valérie Poulin and François Théberge, Ensemble Clustering for Graphs. in: Aiello L., Cherifi C., Cherifi H., Lambiotte R., Lió P., Rocha L. (eds) Complex Networks and Their Applications VII. COMPLEX NETWORKS 2018. Studies in Computational Intelligence, vol 812. Springer (2019), https://doi.org/10.1007/978-3-030-05411-3_19 or https://link.springer.com/chapter/10.1007/978-3-030-05411-3_19 
+
+* Pre-print: https://arxiv.org/abs/1809.05578
+
+* V. Poulin and F. Théberge, Ensemble clustering for graphs: comparisons and applications, Network Science (2019) 4:51 https://doi.org/10.1007/s41109-019-0162-z or https://rdcu.be/bLn9i
+
+* Pre-print: https://arxiv.org/abs/1903.08012
 
 # Included files
 
