@@ -135,6 +135,12 @@ ml = g.community_multilevel()
 ec = g.community_ecg(ens_size=32, final='leiden')
 ```
 
+print modularity (w.r.t. original weights for ECG):
+
+```
+print(ml.modularity, ec.original_modularity)
+```
+
 Finally, we show a few examples of measures we can compute with gam:
 
 ```python
@@ -143,11 +149,5 @@ print('Adjusted Graph-Aware Rand Index for Louvain:',g.gam(ml,tc))
 print('Adjusted Graph-Aware Rand Index for ECG:',g.gam(ec,tc))
 print('\nJaccard Graph-Aware for Louvain:',g.gam(ml,tc,method="jaccard",adjusted=False))
 print('Jaccard Graph-Aware for ECG:',g.gam(ec,tc,method="jaccard",adjusted=False))
-```
-
-print modularity (w.r.t. original weights for ECG):
-
-```
-print(ml.modularity, ec.original_modularity)
 ```
 
