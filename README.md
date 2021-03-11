@@ -81,6 +81,12 @@ ml = community.best_partition(G)
 ec = community.ecg(G, ens_size=32)
 ```
 
+compute modularity:
+
+```
+print(community.modularity(ml,G),community.modularity(ec.partition,G))
+```
+
 We show a few examples of measures we can compute with gam:
 
 ```python
@@ -122,11 +128,11 @@ g.add_vertices(G.nodes())
 g.add_edges(G.edges())
 ```
 
-run Louvain and ecg:
+run Louvain and ECG; for ECG, options for the final alfgorithm are 'louvain' (default) or 'leiden':
 
 ```python
 ml = g.community_multilevel()
-ec = g.community_ecg(ens_size=32)
+ec = g.community_ecg(ens_size=32, final='leiden')
 ```
 
 Finally, we show a few examples of measures we can compute with gam:
@@ -139,4 +145,9 @@ print('\nJaccard Graph-Aware for Louvain:',g.gam(ml,tc,method="jaccard",adjusted
 print('Jaccard Graph-Aware for ECG:',g.gam(ec,tc,method="jaccard",adjusted=False))
 ```
 
+print modularity (w.r.t. original weights for ECG):
+
+```
+print(ml.modularity, ec.original_modularity)
+```
 
