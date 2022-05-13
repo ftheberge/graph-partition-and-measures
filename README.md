@@ -135,10 +135,10 @@ ml = g.community_multilevel()
 ec = g.community_ecg(ens_size=32, final='leiden')
 ```
 
-print modularity (w.r.t. original weights for ECG):
+print modularity:
 
 ```
-print(ml.modularity, ec.original_modularity)
+print(ml.modularity, ec.modularity)
 ```
 
 Finally, we show a few examples of measures we can compute with gam:
