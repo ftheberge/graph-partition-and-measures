@@ -162,7 +162,8 @@ def community_ecg(self, weights=None, ens_size = 16, min_weight = 0.05, final='l
         part = self.community_multilevel(weights=w)
     part.W = w
     part.CSI = 1-2*np.sum([min(1-i,i) for i in w])/len(w)
-    part.original_modularity = self.modularity(part.membership, weights=weights)
+    part._modularity_params['weights'] = weights
+    part.recalculate_modularity()
     return part
 
 igraph.Graph.community_ecg = community_ecg
