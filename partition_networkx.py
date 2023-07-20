@@ -97,7 +97,7 @@ from networkx.algorithms.core import core_number
 import community
 from collections import namedtuple
 
-def community_ecg(self, weight='weight', ens_size = 16, min_weight = 0.05):
+def community_ecg(self, weight='weight', ens_size = 16, min_weight = 0.05, resolution=1.0):
     """
     Stable ensemble-based graph clustering;
     the ensemble consists of single-level randomized Louvain; 
@@ -112,10 +112,12 @@ def community_ecg(self, weight='weight', ens_size = 16, min_weight = 0.05):
       Graph to define the partition on.
     weight : str, optional
       the key in graph to use as weight. Default to 'weight'
-    ens_size: int 
+    ens_size: int, optional
       the size of the ensemble of single-level Louvain
-    min_weight: double in range [0,1] 
+    min_weight: float in range [0,1], optional
       the ECG edge weight for edges with zero votes from the ensemble
+    resolution: positive float, optional
+      resolution parameter; larger values favors smaller communities
 
     Returns
     -------
@@ -166,7 +168,7 @@ def community_ecg(self, weight='weight', ens_size = 16, min_weight = 0.05):
             W[e] = min_weight
 
     networkx.set_edge_attributes(self, W, 'W')
-    part = community.best_partition(self, weight='W')
+    part = community.best_partition(self, weight='W', resolution=resolution)
     P = namedtuple('Partition', ['partition', 'W', 'CSI'])
     w = list(W.values())
     CSI = 1-2*np.sum([min(1-i,i) for i in w])/len(w)

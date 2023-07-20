@@ -91,7 +91,8 @@ igraph.Graph.gam = gam
 import igraph
 import numpy as np
 
-def community_ecg(self, weights=None, ens_size = 16, min_weight = 0.05, final='louvain'):
+def community_ecg(self, weights=None, ens_size = 16, min_weight = 0.05, 
+                  final='louvain', resolution=1.0, refuse_score=False):
     """
     Stable ensemble-based graph clustering;
     the ensemble consists of single-level randomized Louvain; 
@@ -106,12 +107,14 @@ def community_ecg(self, weights=None, ens_size = 16, min_weight = 0.05, final='l
       Graph to define the partition on.
     weights: list of double, optional 
       the edge weights
-    ens_size: int 
+    ens_size: int, optional
       the size of the ensemble of single-level Louvain
-    min_weight: double in range [0,1] 
+    min_weight: double in range [0,1], optional
       the ECG edge weight for edges with zero votes from the ensemble
-    final: 'louvain' or 'leiden'
+    final: 'louvain' (default) or 'leiden'
       the algorithm to run on the final re-weighted graph
+    resolution: positive float, optional
+      resolution parameter; larger values favors smaller communities
       
     Returns
     -------
@@ -157,13 +160,41 @@ def community_ecg(self, weights=None, ens_size = 16, min_weight = 0.05, final='l
     ecore = [min(core[x.tuple[0]],core[x.tuple[1]]) for x in self.es]
     w = [W[i] if ecore[i]>1 else min_weight for i in range(len(ecore))]
     if final=='leiden':
-        part = self.community_leiden(weights=w, objective_function='modularity')
+        part = self.community_leiden(weights=w, objective_function='modularity', resolution=resolution)
     else:
-        part = self.community_multilevel(weights=w)
+        part = self.community_multilevel(weights=w, resolution=resolution)
     part.W = w
     part.CSI = 1-2*np.sum([min(1-i,i) for i in w])/len(w)
     part._modularity_params['weights'] = weights
     part.recalculate_modularity()
+    
+    ## experimental - "refuse to cluster" scores
+    if refuse_score:
+        self.vs['_deg'] = self.degree()
+        self.es['_W'] = part.W
+        self.vs['_ecg'] = part.membership
+        for v in self.vs:
+            scr = 0
+            my_comm = v['_ecg']
+            good = 0
+            bad = 0
+            for e in v.incident():
+                scr += e['_W']
+                if self.vs[e.source]['_ecg'] == self.vs[e.target]['_ecg']:
+                    good += e['_W']
+                else:
+                    bad += e['_W']
+            v['_overall'] = ((v['_deg']-scr)/v['_deg'])
+            v['_community'] = (bad/(bad+good))        
+        part.refuse_overall = self.vs['_overall']
+        part.refuse_community = self.vs['_community']
+        del(self.vs['_deg'])
+        del(self.es['_W'])
+        del(self.vs['_ecg'])
+        del(self.vs['_overall'])
+        del(self.vs['_community'])            
+    ## end experimental scores
+    
     return part
 
 igraph.Graph.community_ecg = community_ecg
