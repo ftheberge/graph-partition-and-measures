@@ -32,7 +32,9 @@ This is a good, stable graph partitioning algorithm. Description and application
 * Valérie Poulin and François Théberge, Ensemble clustering for graphs: comparisons and applications, Network Science (2019) 4:51 https://doi.org/10.1007/s41109-019-0162-z or https://rdcu.be/bLn9i. Pre-print: https://arxiv.org/abs/1903.08012
 * Valérie Poulin and François Théberge, Ensemble Clustering for Graphs. in: Aiello L., Cherifi C., Cherifi H., Lambiotte R., Lió P., Rocha L. (eds) Complex Networks and Their Applications VII. COMPLEX NETWORKS 2018. Studies in Computational Intelligence, vol 812. Springer (2019), https://doi.org/10.1007/978-3-030-05411-3_19. Pre-print: https://arxiv.org/abs/1809.05578
 
-We also added a new experiment over SBM (stochastic block model) graphs, and comparing the results of several clustering algorithms, including ECG, with respect to the spectral detectability threshold. Results are summmarized in this [wiki](https://github.com/ftheberge/graph-partition-and-measures/wiki/Spectral-Threshold-Experiment) and code to run this experiment is provided in this notebook.
+### new experiment
+
+We added a new experiment over SBM (stochastic block model) graphs, and comparing the results of several clustering algorithms, including ECG, with respect to the **spectral detectability threshold**. Results are summmarized in this [wiki](https://github.com/ftheberge/graph-partition-and-measures/wiki/Spectral-Threshold-Experiment) and code to run this experiment is provided in this [notebook](https://github.com/ftheberge/graph-partition-and-measures/blob/master/ECG_spectral_threshold.ipynb).
 
 ## ECG Extras
 
