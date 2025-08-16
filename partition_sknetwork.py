@@ -168,7 +168,7 @@ class ECG:
             clusterer = sn.clustering.Leiden(resolution=self.resolution, shuffle_nodes=True, random_state=self.rng.choice(100000))
     
         self.labels = clusterer.fit_predict(self.weights)
-
+        self.CSI = 1 - np.mean(np.minimum(self.weights.data, 1-self.weights.data))
 
     def fit_predict(self, g):
         self.fit(g)
