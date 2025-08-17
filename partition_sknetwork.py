@@ -1,7 +1,11 @@
 import numpy as np
+import numba
 import scipy.sparse as sp
 import sknetwork as sn
-import numba
+from sknetwork.clustering import BaseClustering, Louvain, Leiden
+from sknetwork.utils.check import check_format, check_random_state, get_probs
+from sknetwork.topology import get_core_decomposition
+
 
 
 @numba.njit
@@ -95,16 +99,53 @@ def _ecg_weights(g_indptr, g_indices, g_data, partitions):
     return g_data
 
 
-class ECG:
+class ECG(BaseClustering):
     """
     Stable ensemble-based graph clustering;
     the ensemble consists of single-level randomized Louvain; 
-    each member of the ensemble gets a "vote" to determine if the edges 
-    are intra-community or not;
+    each member of the ensemble gets a "vote" to determine if the edges are intra-community or not;
     the votes are aggregated into ECG edge-weights in range [0,1]; 
     a final (full depth) Leiden is run using those edge weights;
+
+    Parameters
+    ----------
+    resolution :
+        Resolution parameter.
+    ens_size :
+        Number of Louvain runs in the ensemble
+    min_weight :
+        Minimum edge weight
+    sort_clusters :
+        If ``True``, sort labels in decreasing order of cluster size.
+    return_probs :
+        If ``True``, return the probability distribution over clusters (soft clustering).
+    return_aggregate :
+        If ``True``, return the adjacency matrix of the graph between clusters.
+    random_state :
+        Random number generator or random seed. If None, numpy.random is used.
+    rng :
+        numpy Generator object to use. If passed random_state is not used
+
+    Attributes
+    ----------
+    labels_ : np.ndarray, shape (n_labels,)
+        Label of each node.
+    probs_ : sparse.csr_matrix, shape (n_row, n_labels)
+        Probability distribution over labels.
+    labels_row_, labels_col_ : np.ndarray
+        Labels of rows and columns, for bipartite graphs.
+    probs_row_, probs_col_ : sparse.csr_matrix, shape (n_row, n_labels)
+        Probability distributions over labels for rows and columns (for bipartite graphs).
+    aggregate_ : sparse.csr_matrix
+        Aggregate adjacency matrix or biadjacency matrix between clusters.
+
+    Notes
+    -----
+    The ECG edge weight function is defined as:
+        min_weight + ( 1 - min_weight ) x (#votes_in_ensemble) / ens_size
+    Edges outside the 2-core are assigned 'min_weight'.
     
-    Examples
+    Example
     --------
     >>> g = sn.data.karate_club()
     >>> part = ECG().fit_predict(g)
@@ -120,10 +161,13 @@ class ECG:
             min_weight:float=0.05,
             final:str="leiden",
             resolution:float=1.0,
-            refuse_score:bool=False,
-            seed = None,
-            rng = None
+            sort_clusters:bool=True,
+            return_probs:bool=False,
+            random_state=None,
+            rng=None,
+            return_aggregate:bool=False
     ):
+        super(ECG, self).__init__(sort_clusters=sort_clusters, return_probs=return_probs, return_aggregate=return_aggregate)
         if ens_size <= 0 or not ens_size.is_integer():
             raise ValueError(f"ens_size must be a positive integer. Got {ens_size}")
         self.ens_size = ens_size
@@ -136,40 +180,38 @@ class ECG:
         if resolution < 0:
             raise ValueError(f"resolution must be non-negative. Got {resolution}")
         self.resolution = resolution
-        self.refuse_score = refuse_score
         if rng is not None:
             self.rng = rng
-        elif seed is not None:
-            self.rng = np.random.default_rng(seed)
+        elif random_state is not None:
+            self.rng = np.random.default_rng(random_state)
         else:
             self.rng = np.random.default_rng()
 
 
     def fit(self, g):
+        g = check_format(g)
         # Stage one, compute weights
         self.weights = g.copy().astype("float64")
         partitions = np.empty((g.shape[0], self.ens_size), dtype="int32")
         for i in range(self.ens_size):
-            louvain = sn.clustering.Louvain(resolution=self.resolution, n_aggregations=0, shuffle_nodes=True, random_state=self.rng.choice(100000))
+            louvain = Louvain(resolution=self.resolution, n_aggregations=0, shuffle_nodes=True, random_state=self.rng.choice(2**32))
             partitions[:, i] = louvain.fit_predict(g)
         _ecg_weights(self.weights.indptr, self.weights.indices, self.weights.data, partitions)
         self.weights.data = self.weights.data/self.ens_size
         self.weights.data = self.min_weight + (1-self.min_weight)*self.weights.data
         # Force min_weight outside 2-core
-        core = sn.topology.get_core_decomposition(g)
+        core = get_core_decomposition(g)
         for i, core_num in enumerate(core):
             if core_num < 2:
                 self.weights.data[self.weights.indptr[i]:self.weights.indptr[i+1]] = self.min_weight
 
         # Stage two, cluster weighted graph
         if self.final == "louvain":
-            clusterer = sn.clustering.Louvain(resolution=self.resolution, shuffle_nodes=True, random_state=self.rng.choice(100000))
+            clusterer = Louvain(resolution=self.resolution, shuffle_nodes=True, sort_clusters=self.sort_clusters, random_state=self.rng.choice(2**32))
         else:
-            clusterer = sn.clustering.Leiden(resolution=self.resolution, shuffle_nodes=True, random_state=self.rng.choice(100000))
+            clusterer = Leiden(resolution=self.resolution, shuffle_nodes=True, sort_clusters=self.sort_clusters, random_state=self.rng.choice(2**32))
     
-        self.labels = clusterer.fit_predict(self.weights)
+        self.labels_ = clusterer.fit_predict(self.weights)
         self.CSI = 1 - np.mean(np.minimum(self.weights.data, 1-self.weights.data))
-
-    def fit_predict(self, g):
-        self.fit(g)
-        return self.labels
+        self._secondary_outputs(g)
+        return self
