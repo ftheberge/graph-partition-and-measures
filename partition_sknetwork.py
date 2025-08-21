@@ -168,7 +168,7 @@ class ECG(BaseClustering):
             return_aggregate:bool=False
     ):
         super(ECG, self).__init__(sort_clusters=sort_clusters, return_probs=return_probs, return_aggregate=return_aggregate)
-        if ens_size <= 0 or not ens_size.is_integer():
+        if ens_size <= 0 or not float(ens_size).is_integer():
             raise ValueError(f"ens_size must be a positive integer. Got {ens_size}")
         self.ens_size = ens_size
         if min_weight < 0:
