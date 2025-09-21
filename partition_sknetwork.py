@@ -99,6 +99,21 @@ def _ecg_weights(g_indptr, g_indices, g_data, partitions):
     return g_data
 
 
+@numba.njit
+def _compute_refuse_scores(weights_indptr, weights_indices, weights_data, labels):
+    overall_refuse = np.empty(len(weights_indptr)-1)
+    community_refuse = np.empty(len(weights_indptr)-1)
+    for node in range(len(weights_indptr)-1):
+        degree = weights_indptr[node+1] - weights_indptr[node]
+        edge_weights = weights_data[weights_indptr[node]:weights_indptr[node+1]]
+        weighted_degree = np.sum(edge_weights)
+        neighbor_in_community = labels[weights_indices[weights_indptr[node]:weights_indptr[node+1]]] == labels[node]
+        in_community_weighted_degree = np.sum(edge_weights[neighbor_in_community])
+        overall_refuse[node] = (degree - weighted_degree)/degree
+        community_refuse[node] = in_community_weighted_degree / weighted_degree
+    return overall_refuse, community_refuse
+
+
 class ECG(BaseClustering):
     """
     Stable ensemble-based graph clustering;
@@ -163,6 +178,7 @@ class ECG(BaseClustering):
             resolution:float=1.0,
             sort_clusters:bool=True,
             return_probs:bool=False,
+            refuse_score:bool=False,
             random_state=None,
             rng=None,
             return_aggregate:bool=False
@@ -180,6 +196,7 @@ class ECG(BaseClustering):
         if resolution < 0:
             raise ValueError(f"resolution must be non-negative. Got {resolution}")
         self.resolution = resolution
+        self.refuse_score = refuse_score
         if rng is not None:
             self.rng = rng
         elif random_state is not None:
@@ -214,4 +231,8 @@ class ECG(BaseClustering):
         self.labels_ = clusterer.fit_predict(self.weights)
         self.CSI = 1 - np.mean(np.minimum(self.weights.data, 1-self.weights.data))
         self._secondary_outputs(g)
+
+        if self.refuse_score:
+            self.refuse_overall_, self.refuse_community_ = _compute_refuse_scores(self.weights.indptr, self.weights.indices, self.weights.data, self.labels_)
+
         return self
