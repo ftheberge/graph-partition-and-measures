@@ -1,14 +1,16 @@
 # Graph Partition and Measures
 
 Python3 code implementing 11 graph-aware measures (**gam**) for comparing graph partitions as well as a stable ensemble-based graph partition algorithm (**ECG**).
-This code is pip installable for both **igraph** and **networkx**:
+This code is pip installable for **igraph**, **networkx** and **sknetwork**:
 
 * PyPI (igraph): https://pypi.org/project/partition-igraph/
 * PyPI (networkx): https://pypi.org/project/partition-networkx/
+* PyPI (sknetwork): https://pypi.org/project/partition-sknetwork/
 
 Illustrative examples can be found in the following supplied notebooks:
 * [example_with_igraph](https://github.com/ftheberge/graph-partition-and-measures/blob/master/example_with_igraph.ipynb)
 * [example_with_networkx](https://github.com/ftheberge/graph-partition-and-measures/blob/master/example_with_networkx.ipynb)
+* [example_with_sknetwork](https://github.com/ftheberge/graph-partition-and-measures/blob/master/example_with_sknetwork.ipynb)
   
 ## Graph aware measures (gam)
 
