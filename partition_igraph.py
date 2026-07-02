@@ -152,7 +152,11 @@ def community_ecg(self, weights=None, ens_size = 16, min_weight = 0.05,
         p = np.random.permutation(self.vcount()).tolist()
         g = self.permute_vertices(p)
         l1 = g.community_multilevel(weights=weights, return_levels=True)[0].membership
-        b = [l1[p[x.tuple[0]]]==l1[p[x.tuple[1]]] for x in self.es]
+        if igraph.__version__ >= '1.0.0':
+            inv_p = np.argsort(p)
+            b = [l1[inv_p[x.tuple[0]]]==l1[inv_p[x.tuple[1]]] for x in self.es]
+        else:
+            b = [l1[p[x.tuple[0]]]==l1[p[x.tuple[1]]] for x in self.es]
         W = [W[i]+b[i] for i in range(len(W))]
     W = [min_weight + (1-min_weight)*W[i]/ens_size for i in range(len(W))]
     ## Force min_weight outside 2-core
